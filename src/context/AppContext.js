@@ -1,29 +1,33 @@
 import { createContext, useState } from "react";
-import {baseUrl} from "../baseUrl";
+import { baseUrl } from "../baseUrl";
 
-//step 1: create context
+//step1
 export const AppContext = createContext();
-export function AppContextProvider({ children }) {
-  const [loding, setLoading] = useState();
-  const [post, setPost] = useState([]);
+
+export default function AppContextProvider({ children }) {
+  const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(null);
+
   //data filling pending
 
   async function fetchBlogPosts(page = 1) {
     setLoading(true);
     let url = `${baseUrl}?page=${page}`;
+    console.log("printing the final URL");
+    console.log(url);
     try {
       const result = await fetch(url);
       const data = await result.json();
       console.log(data);
       setPage(data.page);
-      setPost(data.post);
+      setPosts(data.posts);
       setTotalPages(data.totalPages);
     } catch (error) {
-      console.log("error in fetching data");
+      console.log("Error in fetching data");
       setPage(1);
-      setPost([]);
+      setPosts([]);
       setTotalPages(null);
     }
     setLoading(false);
@@ -35,9 +39,9 @@ export function AppContextProvider({ children }) {
   }
 
   const value = {
-    post,
-    setPost,
-    loding,
+    posts,
+    setPosts,
+    loading,
     setLoading,
     page,
     setPage,
@@ -46,8 +50,7 @@ export function AppContextProvider({ children }) {
     fetchBlogPosts,
     handlePageChange,
   };
-  //step 2: return context provider with value as props
-  return <AppContext.Provider value={value}>
-            {children}
-         </AppContext.Provider>;
+
+  //step2
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
